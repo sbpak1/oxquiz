@@ -1,0 +1,96 @@
+package com.example.oxquizproject.service;
+
+import com.example.oxquizproject.dto.UserDto;
+import com.example.oxquizproject.entity.UserEntity;
+import com.example.oxquizproject.repository.UserRepository;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import java.util.Optional;
+
+@ExtendWith(MockitoExtension.class)
+public class UserServiceTest {
+
+    @Mock
+    private UserRepository userRepository;
+
+    @InjectMocks
+    private UserService userService;
+
+    @Test
+    @DisplayName("회원가입 성공 테스트")
+    void testInsertUserSuccess() {
+        // given (테스트에 필요한 환경 설정)
+        UserDto userDto = new UserDto();
+        userDto.setId("testuser");
+        userDto.setPassword("testpass");
+
+        Mockito.when(userRepository.findById("testuser")).thenReturn(Optional.empty());
+        Mockito.when(userRepository.save(Mockito.any(UserEntity.class))).thenReturn(UserDto.toEntity(userDto));
+
+        // when (테스트하려는 메서드 실행)
+        boolean result = userService.insertUser(userDto);
+
+        // then (결과 검증)
+        Assertions.assertTrue(result);
+        Mockito.verify(userRepository, Mockito.times(1)).save(Mockito.any(UserEntity.class));
+    }
+
+    @Test
+    @DisplayName("회원가입 실패 테스트 (아이디 중복)")
+    void testInsertUserFailure() {
+        // given
+        UserDto userDto = new UserDto();
+        userDto.setId("existingUser");
+        userDto.setPassword("testpass");
+
+        UserEntity existingEntity = UserDto.toEntity(userDto);
+        Mockito.when(userRepository.findById("existingUser")).thenReturn(Optional.of(existingEntity));
+
+        // when
+        boolean result = userService.insertUser(userDto);
+
+        // then
+        Assertions.assertFalse(result);
+        Mockito.verify(userRepository, Mockito.times(0)).save(Mockito.any(UserEntity.class));
+    }
+
+    @Test
+    @DisplayName("사용자 조회 성공 테스트")
+    void testFindUserSuccess() {
+        // given
+        String userId = "testuser";
+        UserDto expectedDto = new UserDto();
+        expectedDto.setId(userId);
+        expectedDto.setPassword("testpass");
+
+        UserEntity userEntity = UserDto.toEntity(expectedDto);
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(userEntity));
+
+        // when
+        UserDto resultDto = userService.findUser(userId);
+
+        // then
+        Assertions.assertNotNull(resultDto);
+        Assertions.assertEquals(expectedDto.getId(), resultDto.getId());
+    }
+
+    @Test
+    @DisplayName("사용자 조회 실패 테스트 (사용자 없음)")
+    void testFindUserFailure() {
+        // given
+        String userId = "nonexistentUser";
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // when
+        UserDto resultDto = userService.findUser(userId);
+
+        // then
+        Assertions.assertNull(resultDto);
+    }
+}

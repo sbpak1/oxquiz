@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+    <title>메인 페이지</title>
+</head>
+<body>
+
+<div layout:fragment="content" class="container">
+    <h2>OX 퀴즈에 오신 것을 환영합니다!</h2>
+    <p>이곳은 OX 퀴즈를 즐길 수 있는 사이트입니다. 시작하려면 아래 링크를 클릭하세요.</p>
+    <ul>
+        <li><a th:href="@{/quiz/play}">퀴즈 시작하기</a></li>
+        <li><a th:href="@{/user/list}">사용자 목록 보기 (관리자용)</a></li>
+        <li><a th:href="@{/user/login}">로그인</a></li>
+        <li><a th:href="@{/user/signup}">회원가입</a></li>
+    </ul>
+</div>
+
+</body>
+</html>

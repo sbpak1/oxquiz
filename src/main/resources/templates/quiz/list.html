@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+  <title>퀴즈 목록</title>
+</head>
+<body>
+
+<div layout:fragment="content" class="container">
+  <h2>퀴즈 목록</h2>
+  <a th:href="@{/quiz/insert}">새 퀴즈 등록</a>
+  <table border="1">
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>문제</th>
+      <th>정답 (O/X)</th>
+      <th>관리</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="quiz : ${quizList}">
+      <td th:text="${quiz.id}"></td>
+      <td th:text="${quiz.question}"></td>
+      <td th:text="${quiz.answer} ? 'O' : 'X'"></td>
+      <td>
+        <a th:href="@{/quiz/update/{id}(id=${quiz.id})}">수정</a>
+        <form th:action="@{/quiz/delete/{id}(id=${quiz.id})}" method="post" style="display:inline;">
+          <button type="submit">삭제</button>
+        </form>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+</body>
+</html>

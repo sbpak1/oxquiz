@@ -1,0 +1,79 @@
+package com.example.oxquizproject.service;
+
+import com.example.oxquizproject.dto.QuizDto;
+import com.example.oxquizproject.entity.QuizEntity;
+import com.example.oxquizproject.repository.QuizRepository;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+@ExtendWith(MockitoExtension.class)
+public class QuizServiceTest {
+
+    @Mock
+    private QuizRepository quizRepository;
+
+    @InjectMocks
+    private QuizService quizService;
+
+    @Test
+    @DisplayName("랜덤 퀴즈 조회 테스트")
+    void testFindRandomQuiz() {
+        // given
+        QuizEntity quiz1 = new QuizEntity(1, "문제1", true, null, null);
+        QuizEntity quiz2 = new QuizEntity(2, "문제2", false, null, null);
+        List<QuizEntity> allQuizzes = Arrays.asList(quiz1, quiz2);
+
+        Mockito.when(quizRepository.findAll()).thenReturn(allQuizzes);
+
+        // when
+        QuizEntity randomQuiz = quizService.findRandomQuiz();
+
+        // then
+        Assertions.assertNotNull(randomQuiz);
+        Assertions.assertTrue(allQuizzes.contains(randomQuiz));
+    }
+
+    @Test
+    @DisplayName("퀴즈 등록 성공 테스트")
+    void testInsertQuiz() {
+        // given
+        QuizDto quizDto = new QuizDto("새로운 문제", true);
+        QuizEntity quizEntity = QuizDto.toEntity(quizDto);
+
+        Mockito.when(quizRepository.save(Mockito.any(QuizEntity.class))).thenReturn(quizEntity);
+
+        // when
+        QuizEntity newQuiz = quizService.insertQuiz(quizDto);
+
+        // then
+        Assertions.assertNotNull(newQuiz);
+        Assertions.assertEquals(quizDto.getQuestion(), newQuiz.getQuestion());
+        Mockito.verify(quizRepository, Mockito.times(1)).save(Mockito.any(QuizEntity.class));
+    }
+
+    @Test
+    @DisplayName("ID로 퀴즈 조회 성공 테스트")
+    void testFindQuizById() {
+        // given
+        int quizId = 1;
+        QuizEntity quizEntity = new QuizEntity(quizId, "테스트 문제", true, null, null);
+
+        Mockito.when(quizRepository.findById(quizId)).thenReturn(Optional.of(quizEntity));
+
+        // when
+        QuizEntity foundQuiz = quizService.findQuizById(quizId);
+
+        // then
+        Assertions.assertNotNull(foundQuiz);
+        Assertions.assertEquals(quizId, foundQuiz.getId());
+    }
+}
