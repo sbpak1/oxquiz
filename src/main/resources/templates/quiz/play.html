@@ -1,10 +1,38 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>OX 퀴즈 게임: PLAY</title>
 </head>
 <body>
-
+<div layout:fragment="content" class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card p-4">
+                <h2 class="card-title text-center mb-4">OX 퀴즈 게임: PLAY</h2>
+                <div th:if="${quiz != null}">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">퀴즈:</label>
+                        <div class="card-body border rounded p-3" th:text="${quiz.question}"></div>
+                    </div>
+                    <form th:action="@{/quiz/check}" method="post">
+                        <input type="hidden" name="quizid" th:value="${quiz.id}">
+                        <div class="d-flex justify-content-center gap-3 my-4">
+                            <button type="submit" name="answer" value="true" class="btn btn-outline-primary btn-lg">O</button>
+                            <button type="submit" name="answer" value="false" class="btn btn-outline-danger btn-lg">X</button>
+                        </div>
+                    </form>
+                </div>
+                <div th:unless="${quiz != null}" class="text-center text-muted">
+                    <p>등록된 문제가 없습니다.</p>
+                </div>
+                <div class="text-center mt-3">
+                    <a th:href="@{/}" class="btn btn-link">메인으로 돌아가기</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

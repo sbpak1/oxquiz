@@ -6,34 +6,39 @@
   <title>퀴즈 목록</title>
 </head>
 <body>
-
 <div layout:fragment="content" class="container">
-  <h2>퀴즈 목록</h2>
-  <a th:href="@{/quiz/insert}">새 퀴즈 등록</a>
-  <table border="1">
-    <thead>
-    <tr>
-      <th>ID</th>
-      <th>문제</th>
-      <th>정답 (O/X)</th>
-      <th>관리</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="quiz : ${quizList}">
-      <td th:text="${quiz.id}"></td>
-      <td th:text="${quiz.question}"></td>
-      <td th:text="${quiz.answer} ? 'O' : 'X'"></td>
-      <td>
-        <a th:href="@{/quiz/update/{id}(id=${quiz.id})}">수정</a>
-        <form th:action="@{/quiz/delete/{id}(id=${quiz.id})}" method="post" style="display:inline;">
-          <button type="submit">삭제</button>
-        </form>
-      </td>
-    </tr>
-    </tbody>
-  </table>
+  <h2 class="mb-4">퀴즈 목록</h2>
+  <div class="mb-3">
+    <a th:href="@{/quiz/insert}" class="btn btn-primary">새 퀴즈 등록</a>
+  </div>
+  <div class="card p-4">
+    <table class="table table-hover table-striped">
+      <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>내용</th>
+        <th>정답</th>
+        <th>작성자</th>
+        <th>변경</th>
+        <th>삭제</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="quiz : ${quizList}">
+        <td th:text="${quiz.id}"></td>
+        <td th:text="${quiz.question}"></td>
+        <td th:text="${quiz.answer}"></td>
+        <td th:text="${quiz.writer}"></td>
+        <td><a th:href="@{/quiz/update/{id}(id=${quiz.id})}" class="btn btn-sm btn-info text-white">변경</a></td>
+        <td>
+          <form th:action="@{/quiz/delete/{id}(id=${quiz.id})}" method="post">
+            <button type="submit" class="btn btn-sm btn-danger">삭제</button>
+          </form>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
-
 </body>
 </html>

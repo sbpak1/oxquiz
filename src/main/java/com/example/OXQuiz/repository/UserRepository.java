@@ -9,7 +9,6 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, Integer> {
 
-    Optional<UserEntity> findByIdAndPassword(String id, String password);
-    Optional<UserEntity> findById(String id);
-
+    // 로그인용 사용자 ID(String)로 조회
+    Optional<UserEntity> findByIdEquals(String id);
 }

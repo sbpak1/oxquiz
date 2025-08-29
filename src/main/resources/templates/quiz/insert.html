@@ -1,10 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>퀴즈 등록</title>
 </head>
 <body>
-
+<div layout:fragment="content" class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card p-4">
+                <h2 class="card-title text-center mb-4">퀴즈 등록</h2>
+                <form th:action="@{/quiz/insert}" method="post" th:object="${quizDto}">
+                    <div class="mb-3">
+                        <label for="question" class="form-label">퀴즈 내용:</label>
+                        <textarea id="question" th:field="*{question}" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">퀴즈 정답:</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="answer_true" name="answer" value="true" th:field="*{answer}" required>
+                            <label class="form-check-label" for="answer_true">O</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="answer_false" name="answer" value="false" th:field="*{answer}">
+                            <label class="form-check-label" for="answer_false">X</label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="writer" class="form-label">작성자:</label>
+                        <input type="text" id="writer" th:field="*{writer}" class="form-control" required>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">등록</button>
+                        <a th:href="@{/quiz/list}" class="btn btn-secondary">목록으로 돌아가기</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

@@ -2,21 +2,24 @@ package com.example.OXQuiz.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.sql.Timestamp;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int no;
+    private Integer no;
 
     @Column(unique = true, nullable = false)
     private String id;
@@ -36,9 +39,9 @@ public class UserEntity {
     @Column(columnDefinition = "int default 0")
     private int answerFalse;
 
-    @Column(name = "created_at", updatable = false)
-    private Timestamp createdAt;
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
-    private Timestamp updatedAt;
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 }

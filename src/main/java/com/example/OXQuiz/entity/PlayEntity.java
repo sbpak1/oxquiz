@@ -2,29 +2,38 @@ package com.example.OXQuiz.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "play")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class PlayEntity {
 
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @Column(name = "user_no", nullable = false)
-    private int userNo;
+    private Integer userNo;
 
-    @Column(name = "date_time")
-    private Timestamp dateTime;
+    @Column(name = "quiz_id", nullable = false)
+    private Integer quizId;
 
     @Column(name = "is_correct", nullable = false)
-    private boolean isCorrect;
+    private Boolean isCorrect;
 
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 }

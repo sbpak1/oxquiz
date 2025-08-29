@@ -19,7 +19,7 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
 
-    // 유저 목록 페이지
+    // 유저 목록 페이지 (관리자용)
     @GetMapping("list")
     public String getUserList(Model model) {
         List<UserDto> userDtoList = userService.findAllUsers();
@@ -27,21 +27,25 @@ public class UserController {
         return "/user/list";
     }
 
-    // 회원가입 폼
+    // 회원가입 페이지
     @GetMapping("signup")
     public String getSignupUser(Model model) {
         model.addAttribute("userDto", new UserDto());
         return "/user/signup";
     }
 
-    // 회원가입 처리후 로그인 페이지로 리다이렉트
-    @PostMapping("signup")
+    // 회원가입 처리
+    @PostMapping("/signup")
     public String postSignupUser(@Valid @ModelAttribute("userDto") UserDto dto,
                                  BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) return "/user/signup";
+
+        boolean success = userService.insertUser(dto);
+        if (!success) {
+            bindingResult.rejectValue("id", "error.id", "이미 존재하는 아이디입니다.");
             return "/user/signup";
         }
-        userService.insertUser(dto);
+
         return "redirect:/user/login";
     }
 
@@ -52,28 +56,30 @@ public class UserController {
         return "/user/login";
     }
 
-    // 로그인 데이터 처리
-    // 성공 시 메인 페이지, 실패 시 로그인 페이지로 이동
-    @PostMapping("login")
+    // 로그인 처리
+    @PostMapping("/login")
     public String postLogin(@Valid @ModelAttribute("userDto") UserDto dto,
                             BindingResult bindingResult,
                             HttpSession session) {
         UserDto loginResult = userService.findUser(dto.getId());
-        if (ObjectUtils.isEmpty(loginResult)) {
+
+        if (loginResult == null) {
             bindingResult.rejectValue("id", "error.id", "아이디가 존재하지 않습니다.");
             return "/user/login";
-        } else if (loginResult.getPassword().equals(dto.getPassword())) {
-            if (loginResult.isAdmin() || loginResult.isStatus()) {
-                session.setAttribute("loggedInUser", loginResult);
-                return "redirect:/";
-            } else {
-                bindingResult.rejectValue("id", "error.status", "관리자 승인이 필요합니다.");
-                return "/user/login";
-            }
-        } else {
+        }
+
+        if (!loginResult.getPassword().equals(dto.getPassword())) {
             bindingResult.rejectValue("password", "error.password", "비밀번호가 일치하지 않습니다.");
             return "/user/login";
         }
+
+        if (!loginResult.isAdmin() && !loginResult.isStatus()) {
+            bindingResult.rejectValue("id", "error.status", "관리자 승인이 필요합니다.");
+            return "/user/login";
+        }
+
+        session.setAttribute("loggedInUser", loginResult);
+        return "redirect:/";
     }
 
     // 로그아웃 처리
@@ -83,22 +89,25 @@ public class UserController {
         return "redirect:/user/login";
     }
 
-    // 유저 정보 수정 페이지
     @PostMapping("update")
     public String getUserUpdate(@RequestParam("id") String id, Model model) {
         UserDto userDto = userService.findUser(id);
         model.addAttribute("userDto", userDto);
         return "/user/update";
     }
-    
-    // 유저 정보 업데이트 처리
+
     @PostMapping("updateUser")
     public String postUpdateUser(@Valid @ModelAttribute("userDto") UserDto dto,
                                  BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return "/user/update";
-        }
+        if (bindingResult.hasErrors()) return "/user/update";
         userService.updateUser(dto);
+        return "redirect:/user/list";
+    }
+
+    @PostMapping("approve/{id}")
+    public String approveUserStatus(@PathVariable("id") String id) {
+        boolean success = userService.approveUserStatus(id);
+        // 승인 후 사용자 목록 페이지로 리다이렉트
         return "redirect:/user/list";
     }
 

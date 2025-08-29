@@ -3,31 +3,28 @@ package com.example.OXQuiz.service;
 import com.example.OXQuiz.dto.QuizDto;
 import com.example.OXQuiz.entity.QuizEntity;
 import com.example.OXQuiz.repository.QuizRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
+import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Random;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 public class QuizService {
     private final QuizRepository quizRepository;
 
-
-    // 새로운 퀴즈 등록하기
-    public QuizEntity insertQuiz(QuizDto dto) {
-        QuizEntity entity = QuizDto.toEntity(dto);
-        return quizRepository.save(entity);
+    @Transactional
+    public void saveQuiz(QuizDto dto) {
+        QuizEntity entity = dto.toEntity();
+        quizRepository.save(entity);
     }
 
-    // 퀴즈 목록 조회하기
     public List<QuizEntity> findAllQuizzes() {
         return quizRepository.findAll();
     }
 
-    // DB에서 랜덤으로 퀴즈 하나 조회하기
     public QuizEntity findRandomQuiz() {
         List<QuizEntity> allQuizzes = quizRepository.findAll();
         if (allQuizzes.isEmpty()) {
@@ -38,22 +35,13 @@ public class QuizService {
         return allQuizzes.get(randomIndex);
     }
 
-    // ID의 퀴즈를 찾아 반환
-    public QuizEntity findQuizById(int id) {
-        return quizRepository.findById(id).orElse(null);
+    public QuizEntity findQuizById(Integer id) {
+        Optional<QuizEntity> optionalQuiz = quizRepository.findById(id);
+        return optionalQuiz.orElse(null);
     }
 
-    // ID의 퀴즈를 삭제
     @Transactional
-    public void deleteQuizById(int id) {
+    public void deleteQuizById(Integer id) {
         quizRepository.deleteById(id);
     }
-
-    // 퀴즈 업데이트 ID가 존재하면 업데이트 수행
-    @Transactional
-    public QuizEntity updateQuiz(QuizDto dto) {
-        QuizEntity entity = QuizDto.toEntity(dto);
-        return quizRepository.save(entity);
-    }
-
 }

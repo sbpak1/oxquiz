@@ -1,10 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>퀴즈 정답</title>
 </head>
 <body>
-
+<div layout:fragment="content" class="container text-center">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card p-4">
+                <h2 class="card-title mb-4">OX 퀴즈 게임: 정답</h2>
+                <div th:if="${isCorrect}">
+                    <p class="text-success fw-bold fs-4">정답입니다!</p>
+                </div>
+                <div th:unless="${isCorrect}">
+                    <p class="text-danger fw-bold fs-4">오답입니다.</p>
+                </div>
+                <div class="mt-4">
+                    <a th:href="@{/quiz/play}" class="btn btn-primary">다음 문제 풀기</a>
+                    <a th:href="@{/quiz/list}" class="btn btn-secondary">퀴즈 관리 화면으로 돌아가기</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

@@ -5,7 +5,6 @@ import com.example.OXQuiz.dto.QuizDto;
 import com.example.OXQuiz.entity.QuizEntity;
 import com.example.OXQuiz.service.PlayService;
 import com.example.OXQuiz.service.QuizService;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,77 +13,76 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
-@RequestMapping
+@RequestMapping("/quiz")
 @RequiredArgsConstructor
 public class QuizController {
     private final QuizService quizService;
     private final PlayService playService;
 
-    // 퀴즈 목록 페이지
     @GetMapping("list")
     public String getQuizList(Model model) {
         List<QuizEntity> quizList = quizService.findAllQuizzes();
         model.addAttribute("quizList", quizList);
-        return "/quiz/list";
+        return "quiz/list";
     }
 
-    // 퀴즈 등록 폼
     @GetMapping("insert")
     public String getInsertQuiz(Model model) {
         model.addAttribute("quizDto", new QuizDto());
-        return "/quiz/insert";
+        return "quiz/insert";
     }
 
-    // 퀴즈 등록 후 목록 페이지로 리다이렉트
     @PostMapping("insert")
     public String postInsertQuiz(@ModelAttribute("quizDto") QuizDto dto) {
-        quizService.insertQuiz(dto);
+        quizService.saveQuiz(dto);
         return "redirect:/quiz/list";
     }
 
-    // 퀴즈 수정 폼
     @GetMapping("update/{id}")
-    public String getUpdateQuiz(@PathVariable("id") int id, Model model) {
-        QuizEntity quiz = quizService.findQuizById(id);
-                model.addAttribute("quizDto", quiz);
-        return "/quiz/update";
+    public String getUpdateQuiz(@PathVariable("id") Integer id, Model model) {
+        QuizEntity quizEntity = quizService.findQuizById(id);
+        if (quizEntity == null) return "redirect:/quiz/list";
+        model.addAttribute("quizDto", QuizDto.fromEntity(quizEntity));
+        return "quiz/update";
     }
 
     @PostMapping("update")
     public String postUpdateQuiz(@ModelAttribute("quizDto") QuizDto dto) {
-        quizService.updateQuiz(dto);
+        quizService.saveQuiz(dto);
         return "redirect:/quiz/list";
     }
 
-    // 퀴즈 삭제 후 목록 페이지로 리다이렉트
     @PostMapping("delete/{id}")
-    public String postDeleteQuiz(@PathVariable("id") int id) {
+    public String postDeleteQuiz(@PathVariable("id") Integer id) {
         quizService.deleteQuizById(id);
         return "redirect:/quiz/list";
     }
 
-    // 퀴즈 게임 페이지를 보여주고 랜덤 퀴즈 제공
     @GetMapping("play")
     public String getPlayQuiz(Model model) {
         QuizEntity randomQuiz = quizService.findRandomQuiz();
+        if (randomQuiz == null) return "redirect:/quiz/list?error=noquiz";
         model.addAttribute("quiz", randomQuiz);
-        return "/quiz/play";
+        return "quiz/play";
     }
 
-    // 퀴즈 답안 체크후 결과 처리
     @PostMapping("check")
-    public String postCheckQuiz(@ModelAttribute("playDto") PlayDto dto,
-                                @RequestParam("quizid") int quizId,
-                                HttpSession session, Model model) {
+    public String postCheckQuiz(@RequestParam("quizid") Integer quizId,
+                                @RequestParam("answer") boolean userAnswer,
+                                Model model) {
         QuizEntity quiz = quizService.findQuizById(quizId);
-        boolean isCorrect = quiz.isAnswer() == dto.isCorrect();
+        if (quiz == null) {
+            return "redirect:/quiz/list?error=notfound";
+        }
 
-        dto.setCorrect(isCorrect);
-        playService.savePlayRecord(dto);
+        boolean isCorrect = quiz.getAnswer() == userAnswer;
+
+        PlayDto playDto = new PlayDto();
+        playDto.setQuizId(Integer.valueOf(quizId));
+        playDto.setIsCorrect(isCorrect);
+        // playService.savePlayRecord(playDto); // 필요 시 기록 저장
 
         model.addAttribute("isCorrect", isCorrect);
-        return "/quiz/result";
+        return "quiz/result";
     }
-
-
 }

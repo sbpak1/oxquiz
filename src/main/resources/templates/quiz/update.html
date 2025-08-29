@@ -1,10 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>퀴즈 수정</title>
 </head>
 <body>
+
+<div layout:fragment="content" class="container">
+    <h2>퀴즈 수정</h2>
+    <form th:action="@{/quiz/update}" method="post" th:object="${quizDto}">
+        <input type="hidden" th:field="*{id}" />
+
+        <div>
+            <label for="question">문제:</label>
+            <input type="text" id="question" th:field="*{question}" required>
+        </div>
+        <div>
+            <label>정답:</label>
+            <input type="radio" id="answer_true" value="true" th:field="*{answer}" required>
+            <label for="answer_true">O</label>
+            <input type="radio" id="answer_false" value="false" th:field="*{answer}">
+            <label for="answer_false">X</label>
+        </div>
+        <div>
+            <button type="submit">수정</button>
+        </div>
+    </form>
+</div>
 
 </body>
 </html>
